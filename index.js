@@ -17,7 +17,7 @@ app.post("/upload-avatar", upload.single("file"), async (req, res) => {
     const isValid = await validateFiles({ file, fileType }, allowedMimeTypes);
 
     if (!isValid) {
-      return res.status(400).send("Invalid file type");
+      return res.status(400).send({error:"Invalid file type",data});
     }
 
     // Step 1: Get the presigned URL from your API (replace the URL with your actual API endpoint)
@@ -47,7 +47,12 @@ app.post("/upload-avatar", upload.single("file"), async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send(error.response?.data);
+    res
+      .status(500)
+      .send({
+        data: null,
+        error: error.response?.data?.error || error.response?.data?.message,
+      });
   }
 });
 
