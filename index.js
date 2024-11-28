@@ -4,13 +4,37 @@ import { allowedMimeTypes } from "./constants/index.js";
 import { validateFiles } from "./utils/index.js";
 import axios from "axios";
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
+const whiteListURLS = [
+  "http://localhost:5173",
+  "http://app.dev.defhawk.com.s3-website.ap-south-1.amazonaws.com",
+  "https://defhawk.com",
+  "https://app.defhawk.com",
+];
+
+const corsOpts = {
+  credentials: true,
+  methods: "GET,PUT,POST,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type, Authorization",
+  origin: function (origin, callback) {
+    if (whiteListURLS.indexOf(origin || "") !== -1 || origin === undefined) {
+      callback(null, true);
+    } else {
+      callback(new Error("Unauthorized Domain"), false);
+    }
+  },
+};
+
+app.use(cors(corsOpts)); // Apply CORS middleware
+app.options("*", cors(corsOpts));
 
 app.post("/upload-avatar", upload.single("file"), async (req, res) => {
   try {
+  
     const { file } = req;
     const { folder, fileName, fileType } = req.body;
     // Validate the file MIME type
