@@ -5,7 +5,10 @@ import { validateFiles } from "./utils/index.js";
 async function uploadAsset(req) {
   try {
     const { file } = req;
+    console.log("🚀 ~ uploadAsset ~ file:", file)
     const { folder, fileName, fileType } = req.body;
+    console.log("🚀 ~ uploadAsset ~ folder, fileName, fileType:", folder, fileName, fileType)
+    
     // Validate the file MIME type
     const isValid = await validateFiles({ file, fileType }, allowedMimeTypes);
 
